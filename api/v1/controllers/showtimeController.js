@@ -20,7 +20,7 @@ module.exports = {
                 })
                 .catch((err) => {
                     console.log(err)
-                    return res.send("An error occurs")
+                    return res.status(404).send("An error occurs")
                 })
 
         }

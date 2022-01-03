@@ -28,7 +28,7 @@ module.exports = {
             return res.json(ticketsDetail)
         }
         catch (e) {
-            return res.send("An error occurs")
+            return res.status(404).send("An error occurs")
         }
 
     },
@@ -66,7 +66,7 @@ module.exports = {
                 case 1062:
                     error_msg = "Vé đã tồn tại"
             }
-            return res.json({
+            return res.status(404).json({
                 error_msg
             })
         }
@@ -85,7 +85,7 @@ module.exports = {
 
         }
         catch (e) {
-            return res.send(e)
+            return res.status(404).send(e)
         }
     }
 }

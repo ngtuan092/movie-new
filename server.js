@@ -10,7 +10,7 @@ server.use(cors())
 const routes = require('./api/v1/routes')
 routes(server)
 server.use(function(req, res) {
-    res.status(404).send({url: req.originalUrl + ' not found'})
+    return res.status(404).send({url: req.originalUrl + ' not found'})
 })
 
 server.listen(PORT)
