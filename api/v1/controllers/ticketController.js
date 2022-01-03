@@ -16,7 +16,7 @@ module.exports = {
                     suatchieu: {
                         mave: mave[0].mave,
                         phim: showtimes[0].maphim,
-                        ca: showtimes[0].ca_chieu,
+                        cachieu: showtimes[0].ca_chieu,
                         ngay: showtimes[0].ngayxem,
                         han: mave[0].han,
                         gia: 100000
