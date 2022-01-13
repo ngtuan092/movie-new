@@ -1,6 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
-const { error_msg } = require('../utils');
 
 module.exports = {
     ticketsDetailController: async (req, res, next) => {
@@ -10,25 +9,32 @@ module.exports = {
         try {
             for (const ticket of tickets) {
                 const mave = await db.query('select mave, date_format(han, "%d/%m/%Y %H:%i:%s") han from vephim where malich=? and hang=? and cot=?', [ticket.masuatchieu, ticket.hang, ticket.cot])
-                const showtimes = await db.query('select maphim, ca_chieu, date_format(ngayxem, "%d/%m/%Y") as ngayxem from lichphim where malich=?', [ticket.masuatchieu])
-                // const han = await db.query('select han from vephim where mave = ?', [mave])
+                const showtime = await db.query('select maphim, ca_chieu ca, maphongphim maphong, date_format(ngayxem, "%d/%m/%Y") as ngay from lichphim where malich=?', [ticket.masuatchieu])
+                const maphim = showtime[0].maphim
+                const phim = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
+                const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime[0].maphong])
                 ticketsDetail.push({
+                    mave: mave[0].mave,
                     suatchieu: {
-                        mave: mave[0].mave,
-                        phim: showtimes[0].maphim,
-                        cachieu: showtimes[0].ca_chieu,
-                        ngay: showtimes[0].ngayxem,
-                        han: mave[0].han,
-                        gia: 100000
+                        ma: showtime[0].ma,
+                        phim: phim[0],
+                        maphong: showtime[0].maphong,
+                        ngay: showtime[0].ngay,
+                        ca: showtime[0].ca,
+                        hang: phongphim[0].sohang,
+                        cot: phongphim[0].socot,
                     },
                     hang: ticket.hang,
-                    cot: ticket.cot
+                    cot: ticket.cot,
+                    han: mave[0].han,
+                    gia: 100000
                 })
             }
-            return res.json(ticketsDetail)
+            return res.json({ results: ticketsDetail })
         }
-        catch (e) {
-            return res.status(404).send("An error occurs")
+        catch (err) {
+            console.log(err)
+            return res.status(404).json({ err })
         }
 
     },
@@ -56,19 +62,10 @@ module.exports = {
                     cot: ticket.cot
                 })
             }
-            return res.json(ticketsDetail)
+            return res.json({ results: ticketsDetail })
         }
-        catch (e) {
-            console.log(e)
-            var error_msg = "An error occurs"
-            // console.log(e)
-            switch (e.errno){
-                case 1062:
-                    error_msg = "Vé đã tồn tại"
-            }
-            return res.status(404).json({
-                error_msg
-            })
+        catch (err) {
+            return res.json({ err })
         }
 
 
