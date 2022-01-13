@@ -1,5 +1,5 @@
 const db = require('../db');
-const shift = ["06:00", "08:00", "10:00",  "12:00", "15:00", "17:00", "19:00", "21:00"];
+const shift = ["0", "06:00", "08:00", "10:00",  "12:00", "15:00", "17:00", "19:00", "21:00"];
 module.exports = {
     getShowtimes: async (req, res, next) => {
         const maphim = req.query.maphim;
