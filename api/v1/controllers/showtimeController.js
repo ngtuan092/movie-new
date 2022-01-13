@@ -2,38 +2,38 @@ const error_msg = require('../utils')
 const db = require('../db')
 
 module.exports = {
-    getShowtimes: (req, res, next) => {
-        var maphim = req.query.maphim;
-        var ngay = req.query.ngay;
+    getShowtimes: async (req, res, next) => {
+        const maphim = parseInt(req.query.maphim);
+        const ngay = req.query.ngay;
         const page = req.query.page || 0
-        var arg = ""
-        const num = req.query.num || 10
-        if (page)
-        {
-            arg = `limit ${num * (page - 1)}, ${num}`
-        }
-        if (maphim) {
-            maphim = Number(maphim)
-            db.query('select malich, maphim, maphongphim maphong, DATE_FORMAT(ngayxem, "%d/%m/%Y") as ngayxem, ca_chieu ca from lichphim where ngayxem = str_to_date(?, "%d/%m/%Y") and maphim = ?' + arg, [ngay, maphim])
-                .then((results) => {
-                    return res.json({ results })
-                })
-                .catch((err) => {
-                    console.log(err)
-                    return res.status(404).send("An error occurs")
-                })
+        const skip = req.query.skip || 10
+        try {
 
+            const showtimes = await db.query('select malich ma, maphim, maphongphim maphong, DATE_FORMAT(ngayxem, "%d/%m/%Y") ngay, ca_chieu ca from lichphim where ngayxem = str_to_date(?, "%d/%m/%Y") and maphim = ?', [ngay, maphim, page * skip, skip])
+            const list = []
+            for (let i = 0; i < showtimes.length; i++){
+                const showtime = showtimes[i]
+                const maphim = showtime.maphim;
+                const phim = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
+                const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime.maphong])
+
+                list.push(
+                    {
+                        ma: showtime.ma,
+                        phim: phim[0],
+                        maphong: showtime.maphong,
+                        ngay: showtime.ngay,
+                        ca: showtime.ca,
+                        hang: phongphim[0].sohang,
+                        cot: phongphim[0].socot,
+                    }
+                )
+            }
+            console.log(list.length)
+            return res.json({ results: list })
         }
-        else {
-            db.query(`select malich, maphim, maphongphim, DATE_FORMAT(ngayxem, "%d/%m/%Y") as ngayxem, ca_chieu ca from lichphim where ngayxem = str_to_date(?, "%d/%m/%Y")` + arg
-                , [ngay])
-                .then((results) => {
-                    return res.json({ results })
-                })
-                .catch((err) => {
-                    console.log(err)
-                    return res.send("An error occurs")
-                })
+        catch (err) {
+            return res.json({ err })
         }
 
     },
@@ -46,7 +46,7 @@ module.exports = {
         const sohang = phongphim[0].sohang;
         const socot = phongphim[0].socot;
         const map = []
-        for (let i = 0; i < sohang; i++) {  
+        for (let i = 0; i < sohang; i++) {
             const arr = []
             for (let j = 0; j < socot; j++)
                 arr.push(false)
@@ -55,7 +55,6 @@ module.exports = {
         for (const ticket of tickets) {
             var i = ticket.hang;
             var j = ticket.cot;
-            console.log(ticket.han)
             map[i][j] = true
         }
         return res.json({ results: map })
