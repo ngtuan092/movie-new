@@ -13,7 +13,6 @@ module.exports = {
                 const phim = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
                 const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime[0].maphong])
                 ticketsDetail.push({
-                    mave: mave[0].mave,
                     suatchieu: {
                         ma: showtime[0].ma,
                         phim: phim[0],
@@ -23,15 +22,16 @@ module.exports = {
                         hang: phongphim[0].sohang,
                         cot: phongphim[0].socot,
                     },
+                    trong: mave.length == 0,
                     hang: ticket.hang,
                     cot: ticket.cot,
-                    han: mave[0].han,
                     gia: 100000
                 })
             }
             return res.json({ results: ticketsDetail })
         }
         catch (err) {
+            console.log(err)
             return res.status(404).json({ err })
         }
 
