@@ -5,7 +5,7 @@ module.exports = {
     getShowtimes: (req, res, next) => {
         var maphim = req.query.maphim;
         var ngay = req.query.ngay;
-        const page = req.query.page 
+        const page = req.query.page || 0
         var arg = ""
         const num = req.query.num || 10
         if (page)
@@ -14,7 +14,7 @@ module.exports = {
         }
         if (maphim) {
             maphim = Number(maphim)
-            db.query('select malich, maphim, maphongphim, DATE_FORMAT(ngayxem, "%d/%m/%Y") as ngayxem, ca_chieu ca from lichphim where ngayxem = str_to_date(?, "%d/%m/%Y") and maphim = ?' + arg, [ngay, maphim])
+            db.query('select malich, maphim, maphongphim maphong, DATE_FORMAT(ngayxem, "%d/%m/%Y") as ngayxem, ca_chieu ca from lichphim where ngayxem = str_to_date(?, "%d/%m/%Y") and maphim = ?' + arg, [ngay, maphim])
                 .then((results) => {
                     return res.json({ results })
                 })
@@ -61,3 +61,4 @@ module.exports = {
         return res.json({ results: map })
     }
 }
+

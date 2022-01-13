@@ -2,7 +2,6 @@ const express = require("express")
 
 const filmController = require('./controllers/filmController')
 const filmRouter = express.Router()
-filmRouter.use('/phim-sap-chieu', filmController.getFutureFilms)
 filmRouter.use('/:maphim', filmController.getFilm)
 filmRouter.use('/', filmController.getFilms)
 
@@ -24,6 +23,7 @@ billRouter.use('/:mahoadon',billController.getBillDetail)
 billRouter.use(billController.getBillUUID)
 
 module.exports = function(server) {
+    server.use('/api/phim-sap-chieu', filmController.getFutureFilms)
     server.use('/api/phim', filmRouter)
     server.use('/api/suat-chieu', showtimeRouter)
     server.use('/api/ve', ticketRouter)
