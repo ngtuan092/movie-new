@@ -32,7 +32,6 @@ module.exports = {
             return res.json({ results: ticketsDetail })
         }
         catch (err) {
-            console.log(err)
             return res.status(404).json({ err })
         }
 
@@ -43,7 +42,7 @@ module.exports = {
         try {
             for (const ticket of tickets) {
                 const mave = uuidv4()
-                // await db.query('delete from vephim where convert_tz(han, "+07:00", "+00:00") <= now()')
+                await db.query('delete from vephim where convert_tz(han, "+07:00", "+00:00") <= now()')
                 const showtime = await db.query('select maphim, ca_chieu ca, maphongphim maphong, date_format(ngayxem, "%d/%m/%Y") as ngay from lichphim where malich=?', [ticket.masuatchieu])
                 await db.query('insert into vephim(mave, malich, hang, cot, han) values(?,?,?,?,convert_tz(date_add(now(), interval 5 minute), "+00:00", "+07:00"))', [mave, ticket.masuatchieu, ticket.hang, ticket.cot])
                 const han = await db.query('select date_format(han, "%d/%m/%Y %H:%i:%s") han from vephim where mave = ?', [mave])
