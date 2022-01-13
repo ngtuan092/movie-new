@@ -77,8 +77,8 @@ module.exports = {
                 map.push(arr)
             }
             for (const ticket of tickets) {
-                var i = ticket.hang;
-                var j = ticket.cot;
+                var i = ticket.hang - 1;
+                var j = ticket.cot - 1;
                 map[i][j] = true
             }
             return res.json({ results: map })
