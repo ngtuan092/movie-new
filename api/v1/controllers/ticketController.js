@@ -1,10 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
-
+const shift = ["06:00", "08:00", "10:00", "12:00", "15:00", "17:00", "19:00", "21:00"];
 module.exports = {
     ticketsDetailController: async (req, res, next) => {
         var tickets = req.body
-        // form ve [{masuatchieu, hang, cot}] return [{suatchieu: {phim, ca: (HH:MM), ngay, gia}}, hang, cot]
         const ticketsDetail = []
         try {
             for (const ticket of tickets) {
@@ -20,7 +19,7 @@ module.exports = {
                         phim: phim[0],
                         maphong: showtime[0].maphong,
                         ngay: showtime[0].ngay,
-                        ca: showtime[0].ca,
+                        ca: shift[parseInt(showtime[0].ca)],
                         hang: phongphim[0].sohang,
                         cot: phongphim[0].socot,
                     },
@@ -40,35 +39,39 @@ module.exports = {
     },
     bookController: async (req, res, next) => {
         var tickets = req.body
-        // form ve [{masuatchieu, hang, cot}] return [{suatchieu: {phim, ca: (HH:MM), ngay, gia}}, hang, cot]
         const ticketsDetail = []
         try {
             for (const ticket of tickets) {
                 const mave = uuidv4()
-                await db.query('delete from vephim where convert_tz(han, "+07:00", "+00:00") <= now()')
-                const showtimes = await db.query('select maphim, ca_chieu, date_format(ngayxem, "%d/%m/%Y") as ngayxem from lichphim where malich=?', [ticket.masuatchieu])
-                const stat = await db.query('insert into vephim(mave, malich, hang, cot, han) values(?,?,?,?,convert_tz(date_add(now(), interval 5 minute), "+00:00", "+07:00"))', [mave, ticket.masuatchieu, ticket.hang, ticket.cot])
+                // await db.query('delete from vephim where convert_tz(han, "+07:00", "+00:00") <= now()')
+                const showtime = await db.query('select maphim, ca_chieu ca, maphongphim maphong, date_format(ngayxem, "%d/%m/%Y") as ngay from lichphim where malich=?', [ticket.masuatchieu])
+                await db.query('insert into vephim(mave, malich, hang, cot, han) values(?,?,?,?,convert_tz(date_add(now(), interval 5 minute), "+00:00", "+07:00"))', [mave, ticket.masuatchieu, ticket.hang, ticket.cot])
                 const han = await db.query('select date_format(han, "%d/%m/%Y %H:%i:%s") han from vephim where mave = ?', [mave])
+                const maphim = showtime[0].maphim
+                const phim = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
+                const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime[0].maphong])
                 ticketsDetail.push({
+                    mave,
                     suatchieu: {
-                        mave,
-                        phim: showtimes[0].maphim,
-                        ca: showtimes[0].ca_chieu,
-                        ngay: showtimes[0].ngayxem,
-                        han: han[0].han,
-                        gia: 100000
+                        ma: showtime[0].ma,
+                        phim: phim[0],
+                        maphong: showtime[0].maphong,
+                        ngay: showtime[0].ngay,
+                        ca: shift[parseInt(showtime[0].ca)],
+                        hang: phongphim[0].sohang,
+                        cot: phongphim[0].socot,
                     },
+                    han: han[0].han,
                     hang: ticket.hang,
-                    cot: ticket.cot
+                    cot: ticket.cot,
+                    gia: 100000
                 })
             }
             return res.json({ results: ticketsDetail })
         }
         catch (err) {
-            return res.json({ err })
+            return res.status(404).json({ err })
         }
-
-
     },
     removeTickets: async (req, res, next) => {
         var tickets = req.body
@@ -79,10 +82,9 @@ module.exports = {
             }
             await db.query('delete from vephim where convert_tz(han, "+07:00", "+00:00") <= now()')
             return res.json({ status })
-
         }
-        catch (e) {
-            return res.status(404).send(e)
+        catch (err) {
+            return res.status(404).json(err)
         }
     }
 }

@@ -1,5 +1,5 @@
 const db = require('../db');
-
+const shift = ["06:00", "08:00", "10:00",  "12:00", "15:00", "17:00", "19:00", "21:00"];
 module.exports = {
     getShowtimes: async (req, res, next) => {
         const maphim = req.query.maphim;
@@ -21,7 +21,7 @@ module.exports = {
                             phim: phim[0],
                             maphong: showtime.maphong,
                             ngay: showtime.ngay,
-                            ca: showtime.ca,
+                            ca: shift[parseInt(showtime.ca)],
                             hang: phongphim[0].sohang,
                             cot: phongphim[0].socot,
                         }
@@ -47,7 +47,7 @@ module.exports = {
                             phim: phim[0],
                             maphong: showtime.maphong,
                             ngay: showtime.ngay,
-                            ca: showtime.ca,
+                            ca: shift[parseInt(showtime.ca)],
                             hang: phongphim[0].sohang,
                             cot: phongphim[0].socot,
                         }
