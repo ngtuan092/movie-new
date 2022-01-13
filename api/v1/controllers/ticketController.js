@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const db = require('../db');
-const shift = ["06:00", "08:00", "10:00", "12:00", "15:00", "17:00", "19:00", "21:00"];
+const shift = ["0", "06:00", "08:00", "10:00", "12:00", "15:00", "17:00", "19:00", "21:00"];
 module.exports = {
     ticketsDetailController: async (req, res, next) => {
         var tickets = req.body
