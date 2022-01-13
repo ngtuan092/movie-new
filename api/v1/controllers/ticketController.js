@@ -7,7 +7,7 @@ module.exports = {
         const ticketsDetail = []
         try {
             for (const ticket of tickets) {
-                const mave = await db.query('select mave, date_format(han, "%d/%m/%Y %H:%i:%s") han from vephim where malich=? and hang=? and cot=?', [ticket.masuatchieu, ticket.hang, ticket.cot])
+                const mave = await db.query('select mave, date_format(han, "%d/%m/%Y %H:%i:%s") han from vephim where malich=? and hang=? and cot=? and convert_tz(han, "+07:00", "+00:00") > now()', [ticket.masuatchieu, ticket.hang, ticket.cot])
                 const showtime = await db.query('select maphim, ca_chieu ca, maphongphim maphong, date_format(ngayxem, "%d/%m/%Y") as ngay from lichphim where malich=?', [ticket.masuatchieu])
                 const maphim = showtime[0].maphim
                 const phim = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
