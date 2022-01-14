@@ -9,12 +9,8 @@ module.exports = {
         try {
             await db.query('insert into hoadon(mahoadon, ngaythanhtoan) values(?, convert_tz(now(), "+00:00", "+07:00"))', [mahoadon]);
             for (const ticket of tickets) {
-                const mave = await db.query('select mave from vephim where malich=? and hang=? and cot=? and convert_tz(han, "+07:00", "+00:00") > now()', [ticket.masuatchieu, ticket.hang, ticket.cot])
-                if (!mave[0]) {
-                    throw new Error("Vé hiện đang không có hoặc đã hết hạn.");
-                }
-                await db.query('update vephim set han = "9999-12-31" where mave=?', [mave[0].mave])
-                await db.query('insert into datcho(mahoadon, mave) values(?, ?)', [mahoadon, mave[0].mave])
+                await db.query('update vephim set han = "9999-12-31" where mave=?', [ticket.mave])
+                await db.query('insert into datcho(mahoadon, mave) values(?, ?)', [mahoadon, ticket.mave])
             }
             return res.json({ mahoadon })
         }
