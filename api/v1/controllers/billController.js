@@ -28,7 +28,7 @@ module.exports = {
 
             })
         }
-        catch (e) {
+        catch (err) {
             return res.status(404).json({ err })
         }
     },
