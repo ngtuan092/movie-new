@@ -12,7 +12,7 @@ module.exports = {
                 await db.query('update vephim set han = "9999-12-31" where mave=?', [ticket.mave])
                 await db.query('insert into datcho(mahoadon, mave) values(?, ?)', [mahoadon, ticket.mave])
             }
-            return res.json({ mahoadon })
+            return res.json({ result: mahoadon })
         }
         catch (e) {
             return res.status(404).json({ err })
