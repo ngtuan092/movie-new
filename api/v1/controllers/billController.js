@@ -8,11 +8,22 @@ module.exports = {
         const tickets = req.body
         try {
             await db.query('insert into hoadon(mahoadon, ngaythanhtoan) values(?, convert_tz(now(), "+00:00", "+07:00"))', [mahoadon]);
+            const ticketInfolist = []
             for (const ticket of tickets) {
                 await db.query('update vephim set han = "9999-12-31" where mave=?', [ticket.mave])
                 await db.query('insert into datcho(mahoadon, mave) values(?, ?)', [mahoadon, ticket.mave])
+                const [malich] = await db.query('select malich from vephim where mave=?', [ticket.mave])
+                const [showtime] = await db.query('select DATE_FORMAT(ngayxem, "%d/%m/%Y") ngay, ca_chieu ca from lichphim where malich = ?', [malich.malich])
             }
-            return res.json({ result: mahoadon })
+            return res.json({
+                result: {
+                    mahoadon,
+                    ngay: showtime.ngay,
+                    ca: showtime.ca
+                }
+
+
+            })
         }
         catch (e) {
             return res.status(404).json({ err })
@@ -22,7 +33,7 @@ module.exports = {
         const mahoadon = req.params.mahoadon;
         const cacmave = await db.query('select mave from datcho where mahoadon = ? ', [mahoadon]);
         const ticketlist = []
-        try{
+        try {
             for (const mave of cacmave) {
                 // tu mave.mave tìm suất chiếu, hàng, cột
                 const [ticket] = await db.query('select han, malich, hang, cot from vephim where mave = ?', [mave.mave])
@@ -56,7 +67,7 @@ module.exports = {
         }
         catch (err) {
             console.log(err)
-            return res.status(404).json({err})
+            return res.status(404).json({ err })
         }
     }
 }
