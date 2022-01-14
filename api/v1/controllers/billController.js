@@ -40,9 +40,9 @@ module.exports = {
                 // tu mave.mave tìm suất chiếu, hàng, cột
                 const [ticket] = await db.query('select han, malich, hang, cot from vephim where mave = ?', [mave.mave])
                 const [showtime] = await db.query('select maphim, ca_chieu ca, maphongphim maphong, date_format(ngayxem, "%d/%m/%Y") as ngay from lichphim where malich=?', [ticket.malich])
-                const maphim = showtime[0].maphim
+                const maphim = showtime.maphim
                 const phim = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
-                const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime[0].maphong])
+                const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime.maphong])
                 ticketlist.push({
                     ma: mave.mave,
                     suatchieu: {
