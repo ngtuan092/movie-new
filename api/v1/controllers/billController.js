@@ -14,12 +14,15 @@ module.exports = {
                 await db.query('insert into datcho(mahoadon, mave) values(?, ?)', [mahoadon, ticket.mave])
                 const [malich] = await db.query('select malich from vephim where mave=?', [ticket.mave])
                 const [showtime] = await db.query('select DATE_FORMAT(ngayxem, "%d/%m/%Y") ngay, ca_chieu ca from lichphim where malich = ?', [malich.malich])
+                ticketInfolist.push({
+                    ngay: showtime.ngay,
+                    ca: shift[parseInt(showtime.ca)]
+                })
             }
             return res.json({
                 result: {
                     mahoadon,
-                    ngay: showtime.ngay,
-                    ca: showtime.ca
+                    ve: ticketInfolist
                 }
 
 
