@@ -100,6 +100,27 @@ module.exports = {
         catch (err) {
             return res.json({ err })
         }
-    }
+    },
+    getShowtimeDetail: async (req, res, next) => {
+        try {
+            const masuatchieu = req.params.masuatchieu;
+            const [showtime] = await db.query('select malich ma, maphim, maphongphim maphong, DATE_FORMAT(ngayxem, "%d/%m/%Y") ngay, ca_chieu ca from lichphim where malich = ?', [masuatchieu])
+            const maphim = showtime.maphim;
+            const [phim] = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
+            const [phongphim] = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime.maphong])
 
+            return res.json({
+                ma: showtime.ma,
+                phim: phim,
+                maphong: showtime.maphong,
+                ngay: showtime.ngay,
+                ca: shift[parseInt(showtime.ca)],
+                hang: phongphim.sohang,
+                cot: phongphim.socot,
+            })
+        }
+        catch (err) {
+            return res.json({ err })
+        }
+    }
 }

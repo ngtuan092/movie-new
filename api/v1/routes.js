@@ -8,8 +8,8 @@ filmRouter.use('/', filmController.getFilms)
 const showtimeController = require('./controllers/showtimeController')
 const showtimeRouter = express.Router()
 showtimeRouter.use('/:masuatchieu/ghe', showtimeController.getShowtime)
+showtimeRouter.use('/:masuatchieu', showtimeController.getShowtimeDetail)
 showtimeRouter.use('/', showtimeController.getShowtimes)
-
 
 const ticketController = require('./controllers/ticketController')
 const ticketRouter = express.Router()
