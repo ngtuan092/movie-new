@@ -1,5 +1,5 @@
 const db = require('../db');
-const shift = ["0", "06:00", "08:00", "10:00",  "12:00", "15:00", "17:00", "19:00", "21:00"];
+const shift = ["0", "06:00", "08:00", "10:00", "12:00", "15:00", "17:00", "19:00", "21:00"];
 module.exports = {
     getShowtimes: async (req, res, next) => {
         const maphim = req.query.maphim;
@@ -27,7 +27,14 @@ module.exports = {
                         }
                     )
                 }
-                return res.json({ results: list })
+
+                return res.json({
+                    results: list.sort((a, b) => {
+                        const ca1 = parseInt(a.ca)
+                        const ca2 = parseInt(b.ca)
+                        return ca1 < ca2 ? -1 : ca1 == ca2 ? 0 : 1
+                    })
+                })
             }
             catch (err) {
                 return res.json({ err })
@@ -41,6 +48,7 @@ module.exports = {
                     const maphim = showtime.maphim;
                     const phim = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim = ?', [maphim])
                     const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime.maphong])
+
                     list.push(
                         {
                             ma: showtime.ma,
@@ -53,7 +61,13 @@ module.exports = {
                         }
                     )
                 }
-                return res.json({ results: list })
+                return res.json({
+                    results: list.sort((a, b) => {
+                        const ca1 = parseInt(a.ca)
+                        const ca2 = parseInt(b.ca)
+                        return ca1 < ca2 ? -1 : ca1 == ca2 ? 0 : 1
+                    })
+                })
             }
             catch (err) {
                 return res.json({ err })
