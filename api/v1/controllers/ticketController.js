@@ -14,6 +14,7 @@ module.exports = {
                 const phongphim = await db.query('select sohang, socot from phongphim where maphongphim = ?', [showtime[0].maphong])
                 ticketsDetail.push({
                     suatchieu: {
+                        masuatchieu: ticket.masuatchieu,
                         ma: showtime[0].ma,
                         phim: phim[0],
                         maphong: showtime[0].maphong,
@@ -52,6 +53,7 @@ module.exports = {
                 ticketsDetail.push({
                     mave,
                     suatchieu: {
+                        masuatchieu: ticket.masuatchieu,
                         ma: showtime[0].ma,
                         phim: phim[0],
                         maphong: showtime[0].maphong,
