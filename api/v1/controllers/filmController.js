@@ -10,7 +10,7 @@ module.exports = {
         db.query('select count(maphim) from phim' + condition)
             .then((num_film) => {
                 const page = parseInt(req.query.page) || 0
-                const filmPerPage = req.query.skip || 10
+                const filmPerPage = parseInt(req.query.skip) || 10
                 const maxLength = num_film[0]['count(maphim)']
                 if (maxLength < filmPerPage * page)
                     return res.send('Invalid page')
@@ -40,7 +40,7 @@ module.exports = {
     getFutureFilms: async (req, res, next) => {
         const theloai = req.query.theloai;
         const page = req.query.page || 0;
-        const skip = req.query.skip || 10
+        const skip = parseInt(req.query.skip) || 10
         var condition = ""
         if (theloai) {
             condition = ` and json_search(theloai, 'all', "${theloai}") is not null`

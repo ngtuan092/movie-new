@@ -5,7 +5,7 @@ module.exports = {
         const maphim = req.query.maphim;
         const ngay = req.query.ngay;
         const page = req.query.page || 0
-        const skip = req.query.skip || 10
+        const skip = parseInt(req.query.skip) || 10
         if (maphim) {
             try {
                 const showtimes = await db.query('select malich ma, maphim, maphongphim maphong, DATE_FORMAT(ngayxem, "%d/%m/%Y") ngay, ca_chieu ca from lichphim where ngayxem = str_to_date(?, "%d/%m/%Y") and maphim = ? limit ?, ?', [ngay, maphim, skip * page, skip])
