@@ -5,9 +5,9 @@ module.exports = {
         const theloai = req.query.theloai;
         var condition = ""
         if (theloai) {
-            condition = ` where json_search(theloai, 'all', "${theloai}") is not null`
+            condition = ` and json_search(theloai, 'all', "${theloai}") is not null`
         }
-        db.query('select count(maphim) from phim' + condition)
+        db.query('select count(maphim) from phim where maphim in (select lichphim.maphim from lichphim where ngayxem = date(convert_tz(now(), "+00:00", "+07:00"))' + condition + ')')
             .then((num_film) => {
                 const page = parseInt(req.query.page) || 0
                 const filmPerPage = parseInt(req.query.skip) || 10
@@ -15,7 +15,7 @@ module.exports = {
                 if (maxLength < filmPerPage * page)
                     return res.send('Invalid page')
                 // bổ sung đánh giá, bia
-                db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim' + condition + ' limit ?, ?', [filmPerPage * page, filmPerPage])
+                db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where maphim in (select lichphim.maphim from lichphim where ngayxem = date(convert_tz(now(), "+00:00", "+07:00")))' + condition + ' limit ?, ?', [filmPerPage * page, filmPerPage])
                     .then((results) => {
                         return res.json({ results, maxLength })
                     })
@@ -47,7 +47,7 @@ module.exports = {
         }
         try {
 
-            const results = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where convert_tz(khoi_chieu, "+07:00", "+00:00") > date(now())' + condition)
+            const results = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where date(khoichieu) > date(convert_tz(now(), "+00:00", "+07:00"))' + condition)
             const maxLength = results.length
             return res.json({ results: results.slice(page * skip, (page + 1) * skip), maxLength })
         }
