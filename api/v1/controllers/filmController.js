@@ -47,7 +47,7 @@ module.exports = {
         }
         try {
 
-            const results = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where date(khoichieu) > date(convert_tz(now(), "+00:00", "+07:00"))' + condition)
+            const results = await db.query('select danhgia, bia, maphim ma, tenphim ten, thoigian, theloai, ngonngu, rate, trailer, date_format(khoi_chieu, "%d/%m/%Y") khoichieu, ghichu noidung from phim where date(khoi_chieu) > date(convert_tz(now(), "+00:00", "+07:00"))' + condition)
             const maxLength = results.length
             return res.json({ results: results.slice(page * skip, (page + 1) * skip), maxLength })
         }
